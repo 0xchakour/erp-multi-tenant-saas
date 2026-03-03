@@ -1,0 +1,43 @@
+<?php
+
+namespace App\Providers;
+
+use Illuminate\Cache\RateLimiting\Limit;
+use Illuminate\Http\Request;
+use Illuminate\Support\Facades\RateLimiter;
+use Illuminate\Support\ServiceProvider;
+
+class AppServiceProvider extends ServiceProvider
+{
+    /**
+     * Register any application services.
+     */
+    public function register(): void
+    {
+        //
+    }
+
+    /**
+     * Bootstrap any application services.
+     */
+    public function boot(): void
+    {
+        RateLimiter::for('auth', function (Request $request) {
+            $email = (string) $request->input('email');
+
+            return [
+                Limit::perMinute(10)->by($request->ip() . '|' . $email),
+                Limit::perMinute(30)->by($request->ip()),
+            ];
+        });
+
+        RateLimiter::for('tenant-api', function (Request $request) {
+            $user = $request->user();
+            $key = $user
+                ? $user->company_id . '|' . $user->id
+                : $request->ip();
+
+            return Limit::perMinute(180)->by($key);
+        });
+    }
+}

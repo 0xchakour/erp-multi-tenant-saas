@@ -1,0 +1,101 @@
+:root {
+  --mk-primary-50: #ebf9f8;
+  --mk-primary-100: #d7f3f1;
+  --mk-primary-200: #aee8e4;
+  --mk-primary-300: #7ad8d2;
+  --mk-primary-400: #43c2bb;
+  --mk-primary-500: #1daaa5;
+  --mk-primary-600: #158c89;
+  --mk-primary-700: #12706f;
+  --mk-primary-800: #12595a;
+  --mk-primary-900: #124a4c;
+
+  --mk-accent-50: #fff7eb;
+  --mk-accent-100: #ffedd6;
+  --mk-accent-200: #ffd9ad;
+  --mk-accent-300: #ffbf79;
+  --mk-accent-400: #ff9b3f;
+  --mk-accent-500: #ff7f1a;
+  --mk-accent-600: #f06210;
+  --mk-accent-700: #c74810;
+  --mk-accent-800: #9e3a16;
+  --mk-accent-900: #7f3216;
+
+  --mk-neutral-50: #f7f9fb;
+  --mk-neutral-100: #edf1f5;
+  --mk-neutral-200: #dbe3eb;
+  --mk-neutral-300: #c5d2de;
+  --mk-neutral-400: #98adbf;
+  --mk-neutral-500: #6f879d;
+  --mk-neutral-600: #516a80;
+  --mk-neutral-700: #394f64;
+  --mk-neutral-800: #24374a;
+  --mk-neutral-900: #162738;
+
+  --mk-font-family-display: "Sora", "Manrope", "Segoe UI", sans-serif;
+  --mk-font-family-body: "Manrope", "Segoe UI", sans-serif;
+
+  --mk-font-size-xs: 0.75rem;
+  --mk-font-size-sm: 0.875rem;
+  --mk-font-size-md: 1rem;
+  --mk-font-size-lg: 1.125rem;
+  --mk-font-size-xl: 1.25rem;
+  --mk-font-size-2xl: 1.5rem;
+  --mk-font-size-3xl: 1.875rem;
+  --mk-font-size-4xl: 2.5rem;
+  --mk-font-size-5xl: 3.25rem;
+
+  --mk-space-1: 0.25rem;
+  --mk-space-2: 0.5rem;
+  --mk-space-3: 0.75rem;
+  --mk-space-4: 1rem;
+  --mk-space-5: 1.25rem;
+  --mk-space-6: 1.5rem;
+  --mk-space-8: 2rem;
+  --mk-space-10: 2.5rem;
+  --mk-space-12: 3rem;
+  --mk-space-16: 4rem;
+  --mk-space-20: 5rem;
+
+  --mk-radius-sm: 0.75rem;
+  --mk-radius-md: 1rem;
+  --mk-radius-lg: 1.25rem;
+  --mk-radius-xl: 1.5rem;
+
+  --mk-container-max: 1160px;
+  --mk-container-wide-max: 1240px;
+
+  --mk-elevation-1: 0 8px 22px rgba(8, 26, 42, 0.08);
+  --mk-elevation-2: 0 14px 34px rgba(8, 26, 42, 0.12);
+  --mk-elevation-3: 0 22px 46px rgba(8, 26, 42, 0.15);
+  --mk-elevation-4: 0 30px 62px rgba(8, 26, 42, 0.2);
+
+  --mk-motion-fast: 160ms;
+  --mk-motion-base: 240ms;
+  --mk-motion-slow: 360ms;
+  --mk-motion-slower: 520ms;
+  --mk-motion-curve: cubic-bezier(0.22, 0.61, 0.36, 1);
+
+  --mk-surface: #ffffff;
+  --mk-surface-soft: #f5f8fb;
+  --mk-bg: #f3f7fb;
+  --mk-bg-strong: #e9f0f6;
+  --mk-text: #142335;
+  --mk-text-muted: #4f6378;
+  --mk-border: #d6e1ea;
+}
+
+[data-theme="dark"] {
+  --mk-surface: #111c2a;
+  --mk-surface-soft: #162436;
+  --mk-bg: #0b1421;
+  --mk-bg-strong: #102033;
+  --mk-text: #e8f1fb;
+  --mk-text-muted: #a8bdd2;
+  --mk-border: #1f3550;
+
+  --mk-elevation-1: 0 6px 20px rgba(0, 0, 0, 0.22);
+  --mk-elevation-2: 0 12px 32px rgba(0, 0, 0, 0.3);
+  --mk-elevation-3: 0 18px 44px rgba(0, 0, 0, 0.38);
+  --mk-elevation-4: 0 26px 54px rgba(0, 0, 0, 0.46);
+}
