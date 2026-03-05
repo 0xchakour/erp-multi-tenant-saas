@@ -1,0 +1,21 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 64 64" role="img" aria-label="Nexora ERP logo icon">
+  <defs>
+    <linearGradient id="nx-bg" x1="8" y1="8" x2="56" y2="56" gradientUnits="userSpaceOnUse">
+      <stop offset="0" stop-color="#0f2b23" />
+      <stop offset="1" stop-color="#061510" />
+    </linearGradient>
+    <linearGradient id="nx-glyph" x1="18" y1="19" x2="46" y2="45" gradientUnits="userSpaceOnUse">
+      <stop offset="0" stop-color="#6ee7b7" />
+      <stop offset="1" stop-color="#10b981" />
+    </linearGradient>
+    <radialGradient id="nx-accent" cx="0" cy="0" r="1" gradientUnits="userSpaceOnUse" gradientTransform="translate(47 17) rotate(45) scale(10)">
+      <stop offset="0" stop-color="#a7f3d0" />
+      <stop offset="1" stop-color="#34d399" />
+    </radialGradient>
+  </defs>
+
+  <rect x="4" y="4" width="56" height="56" rx="16" fill="url(#nx-bg)" />
+  <rect x="4.75" y="4.75" width="54.5" height="54.5" rx="15.25" fill="none" stroke="rgba(180, 245, 219, 0.16)" stroke-width="1.5" />
+  <path d="M18 45V19h7.8l12.4 16.1V19H46v26h-7.8L25.8 28.9V45H18Z" fill="url(#nx-glyph)" />
+  <circle cx="47" cy="17" r="5" fill="url(#nx-accent)" />
+</svg>

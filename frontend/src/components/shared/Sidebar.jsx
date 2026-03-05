@@ -17,7 +17,7 @@ export default function Sidebar() {
         <BrandLogo
           size={46}
           tone="dark"
-          title="Tenant ERP"
+          title="Nexora ERP"
           subtitle="Operations Suite"
         />
       </div>

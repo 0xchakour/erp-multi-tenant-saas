@@ -37,7 +37,7 @@ export default function AuthLoadingScreen({ messages = DEFAULT_MESSAGES }) {
             size={66}
             withWordmark={false}
             className="app-loading-logo"
-            title="Tenant ERP"
+            title="Nexora ERP"
             subtitle="Enterprise SaaS"
           />
         </div>

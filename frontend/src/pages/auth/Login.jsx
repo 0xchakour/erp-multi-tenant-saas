@@ -45,7 +45,7 @@ export default function Login() {
           <BrandLogo
             size={64}
             tone="dark"
-            title="Tenant ERP"
+            title="Nexora ERP"
             subtitle="Multi-tenant SaaS"
           />
           <h2>Modern ERP Workspace</h2>

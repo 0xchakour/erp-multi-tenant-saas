@@ -397,6 +397,8 @@ p {
 
 .brand-logo-mark {
   flex-shrink: 0;
+  display: block;
+  object-fit: contain;
   border-radius: 14px;
 }
 
