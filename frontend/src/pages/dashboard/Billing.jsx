@@ -33,7 +33,10 @@ function formatPlanPrice(plan) {
 }
 
 function limitLabel(limit) {
-  return limit === null ? "Unlimited" : String(limit);
+  if (limit === null || limit >= 9999) {
+    return "Unlimited";
+  }
+  return String(limit);
 }
 
 export default function Billing() {
