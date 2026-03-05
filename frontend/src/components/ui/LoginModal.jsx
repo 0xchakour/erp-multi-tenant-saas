@@ -4,6 +4,7 @@ import { useNavigate } from "react-router-dom";
 import SaasLogo from "../marketing/SaasLogo";
 import { useAuth } from "../../hooks/useAuth";
 import { firstFieldError, normalizeApiError } from "../../services/error-utils";
+import RecaptchaField from "../shared/RecaptchaField";
 
 const INITIAL_FORM = {
   email: "",
@@ -30,12 +31,15 @@ function PasswordToggleIcon({ isVisible }) {
 export default function LoginModal({ isOpen, onClose }) {
   const navigate = useNavigate();
   const { login } = useAuth();
+  const recaptchaSiteKey = import.meta.env.VITE_RECAPTCHA_SITE_KEY ?? "";
 
   const [form, setForm] = useState(INITIAL_FORM);
   const [formErrors, setFormErrors] = useState({});
   const [serverError, setServerError] = useState("");
   const [submitting, setSubmitting] = useState(false);
   const [isPasswordVisible, setIsPasswordVisible] = useState(false);
+  const [recaptchaToken, setRecaptchaToken] = useState("");
+  const [recaptchaError, setRecaptchaError] = useState("");
 
   useEffect(() => {
     if (!isOpen) {
@@ -69,6 +73,8 @@ export default function LoginModal({ isOpen, onClose }) {
     setServerError("");
     setSubmitting(false);
     setIsPasswordVisible(false);
+    setRecaptchaToken("");
+    setRecaptchaError("");
   }, [isOpen]);
 
   if (!isOpen) {
@@ -80,18 +86,29 @@ export default function LoginModal({ isOpen, onClose }) {
 
   const handleSubmit = async (event) => {
     event.preventDefault();
-    setSubmitting(true);
     setServerError("");
     setFormErrors({});
+    setRecaptchaError("");
+
+    if (!recaptchaToken) {
+      setRecaptchaError("Please confirm you are not a robot.");
+      return;
+    }
+
+    setSubmitting(true);
 
     try {
-      await login(form);
+      await login({
+        ...form,
+        recaptcha_token: recaptchaToken,
+      });
       onClose();
       navigate("/dashboard", { replace: true });
     } catch (error) {
       const normalized = normalizeApiError(error);
       setServerError(normalized.message);
       setFormErrors(normalized.validationErrors);
+      setRecaptchaToken("");
     } finally {
       setSubmitting(false);
     }
@@ -192,8 +209,21 @@ export default function LoginModal({ isOpen, onClose }) {
 
           {passwordError ? <p className="mk-login-modal-field-error">{passwordError}</p> : null}
 
+          <RecaptchaField
+            className="mk-login-modal-recaptcha"
+            siteKey={recaptchaSiteKey}
+            theme="dark"
+            token={recaptchaToken}
+            onTokenChange={setRecaptchaToken}
+            error={recaptchaError || firstFieldError(formErrors, "recaptcha_token")}
+          />
+
           <div className="mk-login-modal-actions">
-            <button type="submit" className="mk-login-modal-primary" disabled={submitting}>
+            <button
+              type="submit"
+              className="mk-login-modal-primary"
+              disabled={submitting || !recaptchaToken}
+            >
               {submitting ? "Signing in..." : "Login"}
             </button>
 

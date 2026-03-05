@@ -4,6 +4,8 @@ import { useNavigate } from "react-router-dom";
 import SaasLogo from "../marketing/SaasLogo";
 import { useAuth } from "../../hooks/useAuth";
 import { firstFieldError, normalizeApiError } from "../../services/error-utils";
+import RecaptchaField from "../shared/RecaptchaField";
+import LegalConsentNotice from "../shared/LegalConsentNotice";
 
 const INITIAL_FORM = {
   email: "",
@@ -27,9 +29,19 @@ function PasswordToggleIcon({ isVisible }) {
   );
 }
 
+function EyeIcon() {
+  return (
+    <svg viewBox="0 0 24 24" aria-hidden="true" fill="none" stroke="currentColor" strokeWidth="2">
+      <path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z" />
+      <circle cx="12" cy="12" r="3" />
+    </svg>
+  );
+}
+
 export default function AuthModal({ isOpen, onClose }) {
   const navigate = useNavigate();
   const { login } = useAuth();
+  const recaptchaSiteKey = import.meta.env.VITE_RECAPTCHA_SITE_KEY ?? "";
 
   const [activeTab, setActiveTab] = useState("signin");
   const [form, setForm] = useState(INITIAL_FORM);
@@ -37,6 +49,8 @@ export default function AuthModal({ isOpen, onClose }) {
   const [serverError, setServerError] = useState("");
   const [submitting, setSubmitting] = useState(false);
   const [isPasswordVisible, setIsPasswordVisible] = useState(false);
+  const [recaptchaToken, setRecaptchaToken] = useState("");
+  const [recaptchaError, setRecaptchaError] = useState("");
 
   useEffect(() => {
     if (!isOpen) {
@@ -71,6 +85,8 @@ export default function AuthModal({ isOpen, onClose }) {
     setServerError("");
     setSubmitting(false);
     setIsPasswordVisible(false);
+    setRecaptchaToken("");
+    setRecaptchaError("");
   }, [isOpen]);
 
   if (!isOpen) {
@@ -82,18 +98,29 @@ export default function AuthModal({ isOpen, onClose }) {
 
   const handleSignInSubmit = async (event) => {
     event.preventDefault();
-    setSubmitting(true);
     setServerError("");
     setFormErrors({});
+    setRecaptchaError("");
+
+    if (!recaptchaToken) {
+      setRecaptchaError("Please confirm you are not a robot.");
+      return;
+    }
+
+    setSubmitting(true);
 
     try {
-      await login(form);
+      await login({
+        ...form,
+        recaptcha_token: recaptchaToken,
+      });
       onClose();
       navigate("/dashboard", { replace: true });
     } catch (error) {
       const normalized = normalizeApiError(error);
       setServerError(normalized.message);
       setFormErrors(normalized.validationErrors);
+      setRecaptchaToken("");
     } finally {
       setSubmitting(false);
     }
@@ -126,159 +153,173 @@ export default function AuthModal({ isOpen, onClose }) {
           onClick={onClose}
           aria-label="Close authentication modal"
         >
-          <span aria-hidden="true">&times;</span>
+          ✕
         </button>
 
-        <div className="mk-auth-modal-brand">
-          <SaasLogo compact withWordmark={false} />
-        </div>
+        <div className="mk-auth-modal-header">
+          <div className="mk-auth-modal-brand">
+            <SaasLogo compact withWordmark={false} />
+          </div>
 
-        <div className="mk-auth-modal-tabs" role="tablist" aria-label="Authentication options">
-          <button
-            type="button"
-            role="tab"
-            aria-selected={activeTab === "signin"}
-            className={`mk-auth-modal-tab ${activeTab === "signin" ? "is-active" : ""}`}
-            onClick={() => setActiveTab("signin")}
-          >
-            Sign In
-          </button>
-          <button
-            type="button"
-            role="tab"
-            aria-selected={activeTab === "signup"}
-            className={`mk-auth-modal-tab ${activeTab === "signup" ? "is-active" : ""}`}
-            onClick={() => setActiveTab("signup")}
-          >
-            Get Started
-          </button>
+          <div className="mk-auth-modal-tabs" role="tablist" aria-label="Authentication options">
+            <button
+              type="button"
+              role="tab"
+              aria-selected={activeTab === "signin"}
+              className={`mk-auth-modal-tab ${activeTab === "signin" ? "is-active" : ""}`}
+              onClick={() => setActiveTab("signin")}
+            >
+              Sign In
+            </button>
+            <button
+              type="button"
+              role="tab"
+              aria-selected={activeTab === "signup"}
+              className={`mk-auth-modal-tab ${activeTab === "signup" ? "is-active" : ""}`}
+              onClick={() => setActiveTab("signup")}
+            >
+              Get Started
+            </button>
+          </div>
         </div>
 
         <div className="mk-auth-modal-body">
           {activeTab === "signin" ? (
             <div className="mk-auth-modal-content" key="signin">
-              <h2 id="mk-auth-modal-title" className="mk-auth-modal-title">
-                Sign in to your workspace
-              </h2>
-              <p className="mk-auth-modal-subtitle">
-                Continue with your company credentials
-              </p>
-
-              {serverError ? (
-                <p className="mk-auth-modal-error" role="alert">
-                  {serverError}
+              <div className="mk-auth-modal-inner">
+                <h2 id="mk-auth-modal-title" className="mk-auth-modal-title">
+                  Sign in to your workspace
+                </h2>
+                <p className="mk-auth-modal-subtitle">
+                  Continue with your company credentials
                 </p>
-              ) : null}
 
-              <form onSubmit={handleSignInSubmit} className="mk-auth-modal-form">
-                <label className="mk-auth-modal-field" htmlFor="mk-auth-email">
-                  <span>Email</span>
-                  <input
-                    id="mk-auth-email"
-                    type="email"
-                    className={`mk-auth-modal-input ${emailError ? "is-invalid" : ""}`}
-                    placeholder="name@company.com"
-                    autoComplete="email"
-                    value={form.email}
-                    onChange={(event) =>
-                      setForm((previous) => ({ ...previous, email: event.target.value }))
-                    }
-                    required
-                    autoFocus
-                  />
-                </label>
-
-                {emailError ? <p className="mk-auth-modal-field-error">{emailError}</p> : null}
-
-                <label className="mk-auth-modal-field" htmlFor="mk-auth-password">
-                  <span>Password</span>
-                  <div className="mk-auth-modal-password-shell">
-                    <input
-                      id="mk-auth-password"
-                      type={isPasswordVisible ? "text" : "password"}
-                      className={`mk-auth-modal-input mk-auth-modal-input-password ${
-                        passwordError ? "is-invalid" : ""
-                      }`}
-                      placeholder="Your password"
-                      autoComplete="current-password"
-                      value={form.password}
-                      onChange={(event) =>
-                        setForm((previous) => ({ ...previous, password: event.target.value }))
-                      }
-                      required
-                    />
-
-                    <button
-                      type="button"
-                      className="mk-auth-modal-password-toggle"
-                      aria-label={isPasswordVisible ? "Hide password" : "Show password"}
-                      aria-pressed={isPasswordVisible}
-                      onClick={() => setIsPasswordVisible((visible) => !visible)}
-                    >
-                      <PasswordToggleIcon isVisible={isPasswordVisible} />
-                    </button>
-                  </div>
-                </label>
-
-                {passwordError ? (
-                  <p className="mk-auth-modal-field-error">{passwordError}</p>
+                {serverError ? (
+                  <p className="mk-auth-modal-error" role="alert">
+                    {serverError}
+                  </p>
                 ) : null}
 
-                <div className="mk-auth-modal-actions">
-                  <button type="submit" className="mk-auth-modal-primary" disabled={submitting}>
-                    {submitting ? "Signing in..." : "Login"}
-                  </button>
+                <form onSubmit={handleSignInSubmit} className="mk-auth-modal-form">
+                  <div className="mk-auth-modal-field">
+                    <label htmlFor="mk-auth-email">Email</label>
+                    <input
+                      id="mk-auth-email"
+                      type="email"
+                      className={`mk-auth-modal-input ${emailError ? "is-invalid" : ""}`}
+                      placeholder="name@company.com"
+                      autoComplete="email"
+                      value={form.email}
+                      onChange={(event) =>
+                        setForm((previous) => ({ ...previous, email: event.target.value }))
+                      }
+                      required
+                      autoFocus
+                    />
+                    {emailError ? <p className="mk-auth-modal-field-error">{emailError}</p> : null}
+                  </div>
+
+                  <div className="mk-auth-modal-field">
+                    <label htmlFor="mk-auth-password">Password</label>
+                    <div className="mk-auth-modal-password-shell">
+                      <input
+                        id="mk-auth-password"
+                        type={isPasswordVisible ? "text" : "password"}
+                        className={`mk-auth-modal-input ${passwordError ? "is-invalid" : ""}`}
+                        placeholder="Your password"
+                        autoComplete="current-password"
+                        value={form.password}
+                        onChange={(event) =>
+                          setForm((previous) => ({ ...previous, password: event.target.value }))
+                        }
+                        required
+                      />
+
+                      <button
+                        type="button"
+                        className="mk-auth-modal-password-toggle"
+                        aria-label={isPasswordVisible ? "Hide password" : "Show password"}
+                        aria-pressed={isPasswordVisible}
+                        onClick={() => setIsPasswordVisible((visible) => !visible)}
+                      >
+                        <PasswordToggleIcon isVisible={isPasswordVisible} />
+                      </button>
+                    </div>
+                    {passwordError ? (
+                      <p className="mk-auth-modal-field-error">{passwordError}</p>
+                    ) : null}
+                  </div>
+
+                  <RecaptchaField
+                    className="mk-auth-modal-recaptcha"
+                    siteKey={recaptchaSiteKey}
+                    theme="dark"
+                    token={recaptchaToken}
+                    onTokenChange={setRecaptchaToken}
+                    error={recaptchaError || firstFieldError(formErrors, "recaptcha_token")}
+                  />
 
                   <button
-                    type="button"
-                    className="mk-auth-modal-secondary"
-                    onClick={onClose}
-                    disabled={submitting}
+                    type="submit"
+                    className="mk-auth-modal-primary"
+                    disabled={submitting || !recaptchaToken}
                   >
-                    Back
+                    {submitting ? "Signing in..." : "Sign In"}
                   </button>
-                </div>
-              </form>
 
-              <a
-                href="#forgot-password"
-                className="mk-auth-modal-forgot"
-                onClick={(event) => event.preventDefault()}
-              >
-                Forgot password?
-              </a>
+                  <LegalConsentNotice
+                    className="mk-auth-modal-legal"
+                    linkClassName="mk-auth-modal-legal-link"
+                  />
+                </form>
+
+                <a
+                  href="#forgot-password"
+                  className="mk-auth-modal-forgot"
+                  onClick={(event) => event.preventDefault()}
+                >
+                  Forgot your password?
+                </a>
+              </div>
             </div>
           ) : (
             <div className="mk-auth-modal-content" key="signup">
-              <h2 id="mk-auth-modal-title" className="mk-auth-modal-title">
-                Get started with your ERP workspace
-              </h2>
-              <p className="mk-auth-modal-subtitle">
-                Launch your tenant, invite your team, and configure billing in minutes
-              </p>
+              <div className="mk-auth-modal-inner">
+                <h2 id="mk-auth-modal-title" className="mk-auth-modal-title">
+                  Get started with your ERP workspace
+                </h2>
+                <p className="mk-auth-modal-subtitle">
+                  Launch your tenant, invite your team, and configure billing in minutes
+                </p>
 
-              <div className="mk-auth-modal-signup-panel">
-                <ul className="mk-auth-modal-signup-list">
-                  <li>Guided multi-tenant setup</li>
-                  <li>Plan and billing configuration</li>
-                  <li>Secure workspace provisioning</li>
-                </ul>
+                <div className="mk-auth-modal-signup-panel">
+                  <ul className="mk-auth-modal-signup-list">
+                    <li>Guided multi-tenant setup</li>
+                    <li>Plan and billing configuration</li>
+                    <li>Secure workspace provisioning</li>
+                  </ul>
 
-                <button
-                  type="button"
-                  className="mk-auth-modal-primary"
-                  onClick={handleGetStarted}
-                >
-                  Continue Setup
-                </button>
-
-                <button type="button" className="mk-auth-modal-secondary" onClick={onClose}>
-                  Back
-                </button>
+                  <button
+                    type="button"
+                    className="mk-auth-modal-primary"
+                    onClick={handleGetStarted}
+                  >
+                    Continue Setup
+                  </button>
+                </div>
               </div>
             </div>
           )}
         </div>
+
+        <button
+          type="button"
+          className="mk-auth-modal-cancel"
+          onClick={onClose}
+          disabled={submitting}
+        >
+          Cancel
+        </button>
       </section>
     </div>,
     document.body
