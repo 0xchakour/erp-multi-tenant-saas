@@ -12,6 +12,7 @@ import {
 } from "../../services/billing.service";
 import { normalizeApiError } from "../../services/error-utils";
 import { useAuth } from "../../hooks/useAuth";
+import { limitLabel } from "../../utils/limitLabel";
 
 function formatCurrency(value) {
   return new Intl.NumberFormat("en-US", {
@@ -30,13 +31,6 @@ function formatPlanPrice(plan) {
 
   const interval = plan?.billing_interval === "year" ? "year" : "month";
   return `${formatCurrency(price)} / ${interval}`;
-}
-
-function limitLabel(limit) {
-  if (limit === null || limit >= 9999) {
-    return "Unlimited";
-  }
-  return String(limit);
 }
 
 export default function Billing() {
@@ -227,14 +221,16 @@ export default function Billing() {
             {usageRows.map((row) => {
               const value = row.value ?? {};
               const percent = value.usage_percent ?? 0;
-              const displayPercent = value.is_unlimited ? null : Math.max(0, Math.min(percent, 100));
+              const limitText = value.is_unlimited ? "Unlimited" : limitLabel(value.limit);
+              const displayPercent =
+                limitText === "Unlimited" ? null : Math.max(0, Math.min(percent, 100));
 
               return (
                 <article className="usage-row" key={row.key}>
                   <div className="usage-row-header">
                     <p className="usage-row-title">{row.label}</p>
                     <p className="usage-row-values">
-                      {value.current ?? 0} / {value.is_unlimited ? "Unlimited" : value.limit ?? 0}
+                      {value.current ?? 0} / {limitText}
                     </p>
                   </div>
                   {displayPercent === null ? (

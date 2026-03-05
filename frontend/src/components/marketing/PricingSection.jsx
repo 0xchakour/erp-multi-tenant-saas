@@ -1,4 +1,5 @@
 import { Link } from "react-router-dom";
+import { limitLabel } from "../../utils/limitLabel";
 
 function planPrice(plan, cycle) {
   const monthly = Number(plan.price ?? 0);
@@ -13,10 +14,6 @@ function planPrice(plan, cycle) {
   }
 
   return `$${monthly.toFixed(0)} / month`;
-}
-
-function planLimit(limit) {
-  return limit === null ? "Unlimited" : String(limit);
 }
 
 export default function PricingSection({
@@ -73,10 +70,10 @@ export default function PricingSection({
                   {plan.description ? <p className="mk-pricing-description">{plan.description}</p> : null}
 
                   <ul className="mk-pricing-limits">
-                    <li>Users: {planLimit(plan.max_users)}</li>
-                    <li>Clients: {planLimit(plan.max_clients)}</li>
-                    <li>Products: {planLimit(plan.max_products)}</li>
-                    <li>Invoices / month: {planLimit(plan.max_invoices_per_month)}</li>
+                    <li>Users: {limitLabel(plan.max_users)}</li>
+                    <li>Clients: {limitLabel(plan.max_clients)}</li>
+                    <li>Products: {limitLabel(plan.max_products)}</li>
+                    <li>Invoices / month: {limitLabel(plan.max_invoices_per_month)}</li>
                   </ul>
 
                   <Link to={`/onboarding?plan=${plan.id}`} className="mk-btn mk-btn-primary mk-btn-block">
