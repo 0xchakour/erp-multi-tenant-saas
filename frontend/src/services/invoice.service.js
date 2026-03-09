@@ -19,12 +19,6 @@ export async function getInvoiceById(invoiceId) {
   return response.data?.data ?? response.data;
 }
 
-export async function updateInvoice(invoiceId, payload) {
-  requireContractEndpoint("invoices", "update");
-  const response = await api.put(`/invoices/${invoiceId}`, payload);
-  return response.data?.data ?? response.data;
-}
-
 export async function deleteInvoice(invoiceId) {
   requireContractEndpoint("invoices", "destroy");
   await api.delete(`/invoices/${invoiceId}`);
@@ -35,12 +29,6 @@ export async function updateInvoiceStatus(invoiceId, payload) {
   const body = typeof payload === "string" ? { status: payload } : payload;
   const response = await api.patch(`/invoices/${invoiceId}/status`, body);
   return response.data?.data ?? response.data;
-}
-
-export async function listInvoicePayments(invoiceId) {
-  requireContractEndpoint("invoices", "paymentsList");
-  const response = await api.get(`/invoices/${invoiceId}/payments`);
-  return response.data?.data ?? response.data ?? [];
 }
 
 export async function createInvoicePayment(invoiceId, payload) {

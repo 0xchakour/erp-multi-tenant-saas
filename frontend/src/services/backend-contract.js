@@ -1,7 +1,10 @@
-export const BACKEND_CONTRACT = Object.freeze({
+const BACKEND_CONTRACT = Object.freeze({
   auth: {
     register: { method: "POST", path: "/register", available: true },
     login: { method: "POST", path: "/login", available: true },
+    forgotPassword: { method: "POST", path: "/auth/forgot-password", available: true },
+    verifyResetCode: { method: "POST", path: "/auth/verify-reset-code", available: true },
+    resetPassword: { method: "POST", path: "/auth/reset-password", available: true },
     me: { method: "GET", path: "/me", available: true },
     logout: { method: "POST", path: "/logout", available: true },
   },
@@ -13,8 +16,6 @@ export const BACKEND_CONTRACT = Object.freeze({
   },
   billing: {
     status: { method: "GET", path: "/billing/status", available: true },
-    plans: { method: "GET", path: "/billing/plans", available: true },
-    events: { method: "GET", path: "/billing/events", available: true },
     checkoutSession: {
       method: "POST",
       path: "/billing/checkout-session",
@@ -49,7 +50,6 @@ export const BACKEND_CONTRACT = Object.freeze({
   clients: {
     list: { method: "GET", path: "/clients", available: true },
     create: { method: "POST", path: "/clients", available: true },
-    details: { method: "GET", path: "/clients/{client}", available: true },
     update: { method: "PUT|PATCH", path: "/clients/{client}", available: true },
     destroy: { method: "DELETE", path: "/clients/{client}", available: true },
   },
@@ -64,7 +64,6 @@ export const BACKEND_CONTRACT = Object.freeze({
       path: "/products",
       available: true,
     },
-    details: { method: "GET", path: "/products/{product}", available: true },
     update: { method: "PUT|PATCH", path: "/products/{product}", available: true },
     destroy: { method: "DELETE", path: "/products/{product}", available: true },
   },
@@ -85,10 +84,8 @@ export const BACKEND_CONTRACT = Object.freeze({
       path: "/invoices/{invoice}/pdf",
       available: true,
     },
-    update: { method: "PUT|PATCH", path: "/invoices/{invoice}", available: true },
     destroy: { method: "DELETE", path: "/invoices/{invoice}", available: true },
     status: { method: "PATCH", path: "/invoices/{invoice}/status", available: true },
-    paymentsList: { method: "GET", path: "/invoices/{invoice}/payments", available: true },
     paymentsCreate: { method: "POST", path: "/invoices/{invoice}/payments", available: true },
     paymentsDelete: {
       method: "DELETE",

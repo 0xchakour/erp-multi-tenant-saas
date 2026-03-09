@@ -13,12 +13,6 @@ export async function createProduct(payload) {
   return response.data;
 }
 
-export async function getProductById(productId) {
-  requireContractEndpoint("products", "details");
-  const response = await api.get(`/products/${productId}`);
-  return response.data?.data ?? response.data;
-}
-
 export async function updateProduct(productId, payload) {
   requireContractEndpoint("products", "update");
   const response = await api.put(`/products/${productId}`, payload);

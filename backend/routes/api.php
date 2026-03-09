@@ -1,6 +1,7 @@
 <?php
 
 use App\Http\Controllers\Api\AuthController;
+use App\Http\Controllers\Api\Auth\PasswordResetController;
 use App\Http\Controllers\Api\BillingController;
 use App\Http\Controllers\Api\ClientController;
 use App\Http\Controllers\Api\DashboardController;
@@ -18,6 +19,12 @@ Route::get('/user', function (Request $request) {
 
 Route::post('/register', [AuthController::class, 'register'])->middleware('throttle:auth');
 Route::post('/login', [AuthController::class, 'login'])->middleware('throttle:auth');
+Route::post('/auth/forgot-password', [PasswordResetController::class, 'sendResetCode'])
+    ->middleware('throttle:auth');
+Route::post('/auth/verify-reset-code', [PasswordResetController::class, 'verifyCode'])
+    ->middleware('throttle:auth');
+Route::post('/auth/reset-password', [PasswordResetController::class, 'resetPassword'])
+    ->middleware('throttle:auth');
 Route::get('/plans/public', [BillingController::class, 'publicPlans'])->middleware('throttle:tenant-api');
 
 Route::post('/webhooks/stripe', [BillingController::class, 'stripeWebhook'])

@@ -6,19 +6,15 @@ import Button from "../../components/ui/Button";
 import TextInput from "../../components/ui/TextInput";
 import Alert from "../../components/ui/Alert";
 import BrandLogo from "../../components/shared/BrandLogo";
-import RecaptchaField from "../../components/shared/RecaptchaField";
 
 export default function Login() {
   const navigate = useNavigate();
   const { login, isAuthenticated } = useAuth();
-  const recaptchaSiteKey = import.meta.env.VITE_RECAPTCHA_SITE_KEY ?? "";
 
   const [form, setForm] = useState({ email: "", password: "", company_name: "" });
   const [formErrors, setFormErrors] = useState({});
   const [serverError, setServerError] = useState("");
   const [submitting, setSubmitting] = useState(false);
-  const [recaptchaToken, setRecaptchaToken] = useState("");
-  const [recaptchaError, setRecaptchaError] = useState("");
 
   if (isAuthenticated) {
     return <Navigate to="/dashboard" replace />;
@@ -28,26 +24,16 @@ export default function Login() {
     event.preventDefault();
     setServerError("");
     setFormErrors({});
-    setRecaptchaError("");
-
-    if (!recaptchaToken) {
-      setRecaptchaError("Please confirm you are not a robot.");
-      return;
-    }
 
     setSubmitting(true);
 
     try {
-      await login({
-        ...form,
-        recaptcha_token: recaptchaToken,
-      });
+      await login(form);
       navigate("/dashboard", { replace: true });
     } catch (error) {
       const normalized = normalizeApiError(error);
       setServerError(normalized.message);
       setFormErrors(normalized.validationErrors);
-      setRecaptchaToken("");
     } finally {
       setSubmitting(false);
     }
@@ -117,15 +103,7 @@ export default function Login() {
               error={firstFieldError(formErrors, "password")}
             />
 
-            <RecaptchaField
-              className="auth-recaptcha"
-              siteKey={recaptchaSiteKey}
-              token={recaptchaToken}
-              onTokenChange={setRecaptchaToken}
-              error={recaptchaError || firstFieldError(formErrors, "recaptcha_token")}
-            />
-
-            <Button type="submit" fullWidth loading={submitting} disabled={!recaptchaToken}>
+            <Button type="submit" fullWidth loading={submitting}>
               Sign In
             </Button>
           </form>

@@ -4,8 +4,8 @@ import { useNavigate } from "react-router-dom";
 import SaasLogo from "../marketing/SaasLogo";
 import { useAuth } from "../../hooks/useAuth";
 import { firstFieldError, normalizeApiError } from "../../services/error-utils";
-import RecaptchaField from "../shared/RecaptchaField";
 import LegalConsentNotice from "../shared/LegalConsentNotice";
+import ForgotPasswordFlow from "./ForgotPasswordFlow";
 
 const INITIAL_FORM = {
   email: "",
@@ -29,19 +29,9 @@ function PasswordToggleIcon({ isVisible }) {
   );
 }
 
-function EyeIcon() {
-  return (
-    <svg viewBox="0 0 24 24" aria-hidden="true" fill="none" stroke="currentColor" strokeWidth="2">
-      <path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z" />
-      <circle cx="12" cy="12" r="3" />
-    </svg>
-  );
-}
-
 export default function AuthModal({ isOpen, onClose }) {
   const navigate = useNavigate();
   const { login } = useAuth();
-  const recaptchaSiteKey = import.meta.env.VITE_RECAPTCHA_SITE_KEY ?? "";
 
   const [activeTab, setActiveTab] = useState("signin");
   const [form, setForm] = useState(INITIAL_FORM);
@@ -49,8 +39,7 @@ export default function AuthModal({ isOpen, onClose }) {
   const [serverError, setServerError] = useState("");
   const [submitting, setSubmitting] = useState(false);
   const [isPasswordVisible, setIsPasswordVisible] = useState(false);
-  const [recaptchaToken, setRecaptchaToken] = useState("");
-  const [recaptchaError, setRecaptchaError] = useState("");
+  const [isResetFlow, setIsResetFlow] = useState(false);
 
   useEffect(() => {
     if (!isOpen) {
@@ -77,6 +66,7 @@ export default function AuthModal({ isOpen, onClose }) {
   useEffect(() => {
     if (isOpen) {
       setActiveTab("signin");
+      setIsResetFlow(false);
       return;
     }
 
@@ -85,8 +75,7 @@ export default function AuthModal({ isOpen, onClose }) {
     setServerError("");
     setSubmitting(false);
     setIsPasswordVisible(false);
-    setRecaptchaToken("");
-    setRecaptchaError("");
+    setIsResetFlow(false);
   }, [isOpen]);
 
   if (!isOpen) {
@@ -100,27 +89,17 @@ export default function AuthModal({ isOpen, onClose }) {
     event.preventDefault();
     setServerError("");
     setFormErrors({});
-    setRecaptchaError("");
-
-    if (!recaptchaToken) {
-      setRecaptchaError("Please confirm you are not a robot.");
-      return;
-    }
 
     setSubmitting(true);
 
     try {
-      await login({
-        ...form,
-        recaptcha_token: recaptchaToken,
-      });
+      await login(form);
       onClose();
       navigate("/dashboard", { replace: true });
     } catch (error) {
       const normalized = normalizeApiError(error);
       setServerError(normalized.message);
       setFormErrors(normalized.validationErrors);
-      setRecaptchaToken("");
     } finally {
       setSubmitting(false);
     }
@@ -153,7 +132,7 @@ export default function AuthModal({ isOpen, onClose }) {
           onClick={onClose}
           aria-label="Close authentication modal"
         >
-          ✕
+          &times;
         </button>
 
         <div className="mk-auth-modal-header">
@@ -167,7 +146,10 @@ export default function AuthModal({ isOpen, onClose }) {
               role="tab"
               aria-selected={activeTab === "signin"}
               className={`mk-auth-modal-tab ${activeTab === "signin" ? "is-active" : ""}`}
-              onClick={() => setActiveTab("signin")}
+              onClick={() => {
+                setActiveTab("signin");
+                setIsResetFlow(false);
+              }}
             >
               Sign In
             </button>
@@ -176,7 +158,10 @@ export default function AuthModal({ isOpen, onClose }) {
               role="tab"
               aria-selected={activeTab === "signup"}
               className={`mk-auth-modal-tab ${activeTab === "signup" ? "is-active" : ""}`}
-              onClick={() => setActiveTab("signup")}
+              onClick={() => {
+                setActiveTab("signup");
+                setIsResetFlow(false);
+              }}
             >
               Get Started
             </button>
@@ -187,99 +172,111 @@ export default function AuthModal({ isOpen, onClose }) {
           {activeTab === "signin" ? (
             <div className="mk-auth-modal-content" key="signin">
               <div className="mk-auth-modal-inner">
-                <h2 id="mk-auth-modal-title" className="mk-auth-modal-title">
-                  Sign in to your workspace
-                </h2>
-                <p className="mk-auth-modal-subtitle">
-                  Continue with your company credentials
-                </p>
-
-                {serverError ? (
-                  <p className="mk-auth-modal-error" role="alert">
-                    {serverError}
-                  </p>
-                ) : null}
-
-                <form onSubmit={handleSignInSubmit} className="mk-auth-modal-form">
-                  <div className="mk-auth-modal-field">
-                    <label htmlFor="mk-auth-email">Email</label>
-                    <input
-                      id="mk-auth-email"
-                      type="email"
-                      className={`mk-auth-modal-input ${emailError ? "is-invalid" : ""}`}
-                      placeholder="name@company.com"
-                      autoComplete="email"
-                      value={form.email}
-                      onChange={(event) =>
-                        setForm((previous) => ({ ...previous, email: event.target.value }))
+                {isResetFlow ? (
+                  <ForgotPasswordFlow
+                    initialEmail={form.email}
+                    onBackToSignIn={(email = "") => {
+                      setIsResetFlow(false);
+                      if (email) {
+                        setForm((previous) => ({ ...previous, email }));
                       }
-                      required
-                      autoFocus
-                    />
-                    {emailError ? <p className="mk-auth-modal-field-error">{emailError}</p> : null}
-                  </div>
+                    }}
+                  />
+                ) : (
+                  <>
+                    <h2 id="mk-auth-modal-title" className="mk-auth-modal-title">
+                      Sign in to your workspace
+                    </h2>
+                    <p className="mk-auth-modal-subtitle">
+                      Continue with your company credentials
+                    </p>
 
-                  <div className="mk-auth-modal-field">
-                    <label htmlFor="mk-auth-password">Password</label>
-                    <div className="mk-auth-modal-password-shell">
-                      <input
-                        id="mk-auth-password"
-                        type={isPasswordVisible ? "text" : "password"}
-                        className={`mk-auth-modal-input ${passwordError ? "is-invalid" : ""}`}
-                        placeholder="Your password"
-                        autoComplete="current-password"
-                        value={form.password}
-                        onChange={(event) =>
-                          setForm((previous) => ({ ...previous, password: event.target.value }))
-                        }
-                        required
-                      />
+                    {serverError ? (
+                      <p className="mk-auth-modal-error" role="alert">
+                        {serverError}
+                      </p>
+                    ) : null}
+
+                    <form onSubmit={handleSignInSubmit} className="mk-auth-modal-form">
+                      <div className="mk-auth-modal-field">
+                        <label htmlFor="mk-auth-email">Email</label>
+                        <input
+                          id="mk-auth-email"
+                          type="email"
+                          className={`mk-auth-modal-input ${emailError ? "is-invalid" : ""}`}
+                          placeholder="name@company.com"
+                          autoComplete="email"
+                          value={form.email}
+                          onChange={(event) =>
+                            setForm((previous) => ({ ...previous, email: event.target.value }))
+                          }
+                          required
+                          autoFocus
+                        />
+                        {emailError ? (
+                          <p className="mk-auth-modal-field-error">{emailError}</p>
+                        ) : null}
+                      </div>
+
+                      <div className="mk-auth-modal-field">
+                        <label htmlFor="mk-auth-password">Password</label>
+                        <div className="mk-auth-modal-password-shell">
+                          <input
+                            id="mk-auth-password"
+                            type={isPasswordVisible ? "text" : "password"}
+                            className={`mk-auth-modal-input ${passwordError ? "is-invalid" : ""}`}
+                            placeholder="Your password"
+                            autoComplete="current-password"
+                            value={form.password}
+                            onChange={(event) =>
+                              setForm((previous) => ({ ...previous, password: event.target.value }))
+                            }
+                            required
+                          />
+
+                          <button
+                            type="button"
+                            className="mk-auth-modal-password-toggle"
+                            aria-label={isPasswordVisible ? "Hide password" : "Show password"}
+                            aria-pressed={isPasswordVisible}
+                            onClick={() => setIsPasswordVisible((visible) => !visible)}
+                          >
+                            <PasswordToggleIcon isVisible={isPasswordVisible} />
+                          </button>
+                        </div>
+                        {passwordError ? (
+                          <p className="mk-auth-modal-field-error">{passwordError}</p>
+                        ) : null}
+                      </div>
 
                       <button
-                        type="button"
-                        className="mk-auth-modal-password-toggle"
-                        aria-label={isPasswordVisible ? "Hide password" : "Show password"}
-                        aria-pressed={isPasswordVisible}
-                        onClick={() => setIsPasswordVisible((visible) => !visible)}
+                        type="submit"
+                        className="mk-auth-modal-primary"
+                        disabled={submitting}
                       >
-                        <PasswordToggleIcon isVisible={isPasswordVisible} />
+                        {submitting ? "Signing in..." : "Sign In"}
                       </button>
-                    </div>
-                    {passwordError ? (
-                      <p className="mk-auth-modal-field-error">{passwordError}</p>
-                    ) : null}
-                  </div>
 
-                  <RecaptchaField
-                    className="mk-auth-modal-recaptcha"
-                    siteKey={recaptchaSiteKey}
-                    theme="dark"
-                    token={recaptchaToken}
-                    onTokenChange={setRecaptchaToken}
-                    error={recaptchaError || firstFieldError(formErrors, "recaptcha_token")}
-                  />
+                      <LegalConsentNotice
+                        className="mk-auth-modal-legal"
+                        linkClassName="mk-auth-modal-legal-link"
+                      />
+                    </form>
 
-                  <button
-                    type="submit"
-                    className="mk-auth-modal-primary"
-                    disabled={submitting || !recaptchaToken}
-                  >
-                    {submitting ? "Signing in..." : "Sign In"}
-                  </button>
-
-                  <LegalConsentNotice
-                    className="mk-auth-modal-legal"
-                    linkClassName="mk-auth-modal-legal-link"
-                  />
-                </form>
-
-                <a
-                  href="#forgot-password"
-                  className="mk-auth-modal-forgot"
-                  onClick={(event) => event.preventDefault()}
-                >
-                  Forgot your password?
-                </a>
+                    <a
+                      href="#forgot-password"
+                      className="mk-auth-modal-forgot"
+                      onClick={(event) => {
+                        event.preventDefault();
+                        setServerError("");
+                        setFormErrors({});
+                        setIsResetFlow(true);
+                      }}
+                    >
+                      Forgot your password?
+                    </a>
+                  </>
+                )}
               </div>
             </div>
           ) : (

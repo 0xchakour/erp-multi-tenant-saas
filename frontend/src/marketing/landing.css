@@ -365,319 +365,6 @@ html {
 }
 
 /* ------------------------------------------------------
-   Login Modal
------------------------------------------------------- */
-
-.mk-login-modal-overlay {
-  position: fixed;
-  inset: 0;
-  background: rgba(0, 0, 0, 0.65);
-  backdrop-filter: blur(6px);
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  padding: 1rem;
-  z-index: 220;
-  animation: mk-login-overlay-in 220ms var(--mk-curve-premium) both;
-}
-
-.mk-login-modal-card {
-  position: relative;
-  width: clamp(420px, 34vw, 460px);
-  max-width: min(460px, calc(100vw - 2rem));
-  border-radius: 18px;
-  padding: 32px;
-  background: rgba(20, 30, 28, 0.95);
-  border: 1px solid rgba(148, 211, 192, 0.24);
-  box-shadow: 0 40px 100px rgba(0, 0, 0, 0.6);
-  color: #e7f2ed;
-  display: grid;
-  gap: 0.78rem;
-  animation: mk-login-card-in 260ms var(--mk-curve-premium) both;
-}
-
-.mk-login-modal-close {
-  position: absolute;
-  top: 14px;
-  right: 14px;
-  width: 34px;
-  height: 34px;
-  border-radius: 999px;
-  border: 1px solid rgba(148, 211, 192, 0.2);
-  background: rgba(13, 24, 21, 0.84);
-  color: rgba(231, 242, 237, 0.85);
-  font-size: 1.36rem;
-  line-height: 1;
-  display: grid;
-  place-items: center;
-  cursor: pointer;
-  transition:
-    transform 170ms var(--mk-curve-premium),
-    border-color 170ms var(--mk-curve-premium),
-    color 170ms var(--mk-curve-premium),
-    background-color 170ms var(--mk-curve-premium);
-}
-
-.mk-login-modal-close:hover {
-  transform: translateY(-1px);
-  color: #f2fbf7;
-  border-color: rgba(148, 211, 192, 0.42);
-  background: rgba(16, 29, 26, 0.95);
-}
-
-.mk-login-modal-close:focus-visible {
-  outline: none;
-  box-shadow: 0 0 0 3px rgba(67, 194, 187, 0.24);
-}
-
-.mk-login-modal-brand {
-  margin-bottom: 0.18rem;
-}
-
-.mk-login-modal-brand .mk-logo-mark {
-  box-shadow: 0 10px 24px rgba(0, 0, 0, 0.35);
-}
-
-.mk-login-modal-title {
-  margin: 0;
-  font-family: var(--mk-font-family-display);
-  font-size: clamp(1.45rem, 2.2vw, 1.72rem);
-  line-height: 1.12;
-  letter-spacing: -0.02em;
-  color: #f2fbf6;
-}
-
-.mk-login-modal-subtitle {
-  margin: 0;
-  color: rgba(183, 210, 200, 0.9);
-  font-size: var(--mk-font-size-sm);
-}
-
-.mk-login-modal-error {
-  margin: 0.24rem 0 0;
-  padding: 0.66rem 0.72rem;
-  border-radius: 10px;
-  border: 1px solid rgba(252, 165, 165, 0.26);
-  background: rgba(127, 29, 29, 0.44);
-  color: #fecaca;
-  font-size: var(--mk-font-size-sm);
-}
-
-.mk-login-modal-form {
-  margin-top: 0.24rem;
-  display: grid;
-  gap: 0.72rem;
-}
-
-.mk-login-modal-field {
-  display: grid;
-  gap: 0.38rem;
-}
-
-.mk-login-modal-field > span {
-  color: rgba(220, 240, 232, 0.94);
-  font-size: var(--mk-font-size-sm);
-  font-weight: 700;
-}
-
-.mk-login-modal-input {
-  width: 100%;
-  min-height: 44px;
-  border-radius: 12px;
-  border: 1px solid rgba(148, 211, 192, 0.2);
-  background: rgba(10, 20, 18, 0.76);
-  color: #eef7f2;
-  font-size: var(--mk-font-size-sm);
-  padding: 0.68rem 0.78rem;
-  transition:
-    border-color 170ms var(--mk-curve-premium),
-    box-shadow 170ms var(--mk-curve-premium);
-}
-
-.mk-login-modal-input::placeholder {
-  color: rgba(167, 190, 180, 0.72);
-}
-
-.mk-login-modal-input:focus {
-  outline: none;
-  border-color: color-mix(in srgb, var(--mk-primary-300) 72%, transparent);
-  box-shadow: 0 0 0 3px rgba(67, 194, 187, 0.2);
-}
-
-.mk-login-modal-input.is-invalid {
-  border-color: rgba(252, 165, 165, 0.5);
-}
-
-.mk-login-modal-password-shell {
-  display: flex;
-  align-items: center;
-  border-radius: 12px;
-  border: 1px solid rgba(148, 211, 192, 0.2);
-  background: rgba(10, 20, 18, 0.76);
-  transition:
-    border-color 170ms var(--mk-curve-premium),
-    box-shadow 170ms var(--mk-curve-premium);
-}
-
-.mk-login-modal-password-shell:focus-within {
-  border-color: color-mix(in srgb, var(--mk-primary-300) 72%, transparent);
-  box-shadow: 0 0 0 3px rgba(67, 194, 187, 0.2);
-}
-
-.mk-login-modal-password-shell.is-invalid {
-  border-color: rgba(252, 165, 165, 0.5);
-}
-
-.mk-login-modal-input-password {
-  min-height: 42px;
-  border: 0;
-  background: transparent;
-  box-shadow: none;
-  padding-right: 0.36rem;
-}
-
-.mk-login-modal-input-password:focus {
-  box-shadow: none;
-}
-
-.mk-login-modal-password-toggle {
-  width: 38px;
-  height: 38px;
-  margin-right: 4px;
-  border: 0;
-  border-radius: 10px;
-  background: transparent;
-  color: rgba(183, 210, 200, 0.86);
-  display: grid;
-  place-items: center;
-  cursor: pointer;
-  transition:
-    color 170ms var(--mk-curve-premium),
-    background-color 170ms var(--mk-curve-premium);
-}
-
-.mk-login-modal-password-toggle:hover {
-  color: #f0faf5;
-  background: rgba(255, 255, 255, 0.06);
-}
-
-.mk-login-modal-password-toggle:focus-visible {
-  outline: none;
-  box-shadow: inset 0 0 0 2px rgba(67, 194, 187, 0.28);
-}
-
-.mk-login-modal-password-toggle svg {
-  width: 19px;
-  height: 19px;
-  fill: currentColor;
-}
-
-.mk-login-modal-field-error {
-  margin: -0.22rem 0 0;
-  color: #fecaca;
-  font-size: var(--mk-font-size-xs);
-  font-weight: 700;
-}
-
-.mk-login-modal-recaptcha {
-  margin-top: -0.1rem;
-}
-
-.mk-login-modal-recaptcha .g-recaptcha {
-  transform-origin: left top;
-}
-
-.mk-login-modal-actions {
-  margin-top: 0.4rem;
-  display: grid;
-  grid-template-columns: 1fr auto;
-  gap: 0.62rem;
-}
-
-.mk-login-modal-primary,
-.mk-login-modal-secondary {
-  min-height: 44px;
-  border-radius: 12px;
-  border: 1px solid transparent;
-  font-size: var(--mk-font-size-sm);
-  font-weight: 800;
-  cursor: pointer;
-  transition:
-    transform 170ms var(--mk-curve-premium),
-    box-shadow 170ms var(--mk-curve-premium),
-    border-color 170ms var(--mk-curve-premium),
-    background-color 170ms var(--mk-curve-premium);
-}
-
-.mk-login-modal-primary {
-  color: #edfff6;
-  background: linear-gradient(135deg, #12a56f, #0f766e);
-  border-color: rgba(125, 255, 213, 0.18);
-  box-shadow: 0 14px 30px rgba(14, 163, 119, 0.26);
-}
-
-.mk-login-modal-primary:hover:not(:disabled) {
-  transform: translateY(-1px);
-  box-shadow: 0 18px 34px rgba(14, 163, 119, 0.33);
-}
-
-.mk-login-modal-secondary {
-  min-width: 100px;
-  color: rgba(220, 240, 232, 0.94);
-  background: rgba(26, 43, 39, 0.68);
-  border-color: rgba(148, 211, 192, 0.24);
-}
-
-.mk-login-modal-secondary:hover:not(:disabled) {
-  transform: translateY(-1px);
-  border-color: rgba(148, 211, 192, 0.4);
-  background: rgba(32, 53, 47, 0.75);
-}
-
-.mk-login-modal-primary:disabled,
-.mk-login-modal-secondary:disabled {
-  opacity: 0.7;
-  cursor: not-allowed;
-}
-
-.mk-login-modal-forgot {
-  margin-top: 0.42rem;
-  width: fit-content;
-  color: rgba(183, 210, 200, 0.94);
-  font-size: var(--mk-font-size-xs);
-  font-weight: 700;
-  text-decoration: underline;
-  text-underline-offset: 2px;
-  transition: color 170ms var(--mk-curve-premium);
-}
-
-.mk-login-modal-forgot:hover {
-  color: #f0faf5;
-}
-
-@keyframes mk-login-overlay-in {
-  from {
-    opacity: 0;
-  }
-
-  to {
-    opacity: 1;
-  }
-}
-
-@keyframes mk-login-card-in {
-  from {
-    opacity: 0;
-    transform: translateY(8px) scale(0.96);
-  }
-
-  to {
-    opacity: 1;
-    transform: translateY(0) scale(1);
-  }
-}
-
-/* ------------------------------------------------------
    Unified Auth Modal - Modern SaaS Style
 ------------------------------------------------------ */
 
@@ -839,6 +526,26 @@ html {
   line-height: 1.5;
 }
 
+.mk-auth-modal-step-indicator {
+  margin: 0;
+  text-align: center;
+  color: rgba(110, 231, 183, 0.9);
+  font-size: 0.72rem;
+  font-weight: 700;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+}
+
+.mk-auth-modal-info {
+  padding: 12px 14px;
+  border-radius: 10px;
+  border: 1px solid rgba(52, 211, 153, 0.35);
+  background: rgba(5, 150, 105, 0.18);
+  color: #a7f3d0;
+  font-size: 0.85rem;
+  line-height: 1.4;
+}
+
 .mk-auth-modal-error {
   padding: 12px 14px;
   border-radius: 10px;
@@ -900,6 +607,13 @@ html {
   background: rgba(127, 29, 29, 0.15);
 }
 
+.mk-auth-modal-code-input {
+  letter-spacing: 0.45em;
+  text-align: center;
+  font-weight: 700;
+  font-size: 1rem;
+}
+
 .mk-auth-modal-password-shell {
   position: relative;
 }
@@ -950,14 +664,6 @@ html {
   font-size: 0.75rem;
   font-weight: 600;
   text-transform: uppercase;
-}
-
-.mk-auth-modal-recaptcha {
-  margin-top: -2px;
-}
-
-.mk-auth-modal-recaptcha .g-recaptcha {
-  transform-origin: left top;
 }
 
 .mk-auth-modal-legal {
@@ -1035,6 +741,14 @@ html {
   cursor: not-allowed;
 }
 
+.mk-auth-modal-inline-actions {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 14px;
+  flex-wrap: wrap;
+}
+
 .mk-auth-modal-cancel {
   padding-bottom: 24px;
   padding: 0 28px 24px;
@@ -1077,6 +791,18 @@ html {
   text-decoration: underline;
   text-decoration-color: #10b981;
   text-underline-offset: 3px;
+}
+
+.mk-auth-modal-success {
+  margin: 0;
+  padding: 14px 16px;
+  border-radius: 10px;
+  border: 1px solid rgba(52, 211, 153, 0.45);
+  background: rgba(6, 95, 70, 0.32);
+  color: #d1fae5;
+  font-size: 0.9rem;
+  line-height: 1.45;
+  text-align: center;
 }
 
 .mk-auth-modal-signup-panel {
@@ -2826,25 +2552,6 @@ html {
     width: 100%;
   }
 
-  .mk-login-modal-card {
-    width: min(460px, calc(100vw - 1.4rem));
-    padding: 1.4rem;
-    border-radius: 16px;
-  }
-
-  .mk-login-modal-actions {
-    grid-template-columns: 1fr;
-  }
-
-  .mk-login-modal-secondary {
-    width: 100%;
-  }
-
-  .mk-login-modal-recaptcha .g-recaptcha,
-  .mk-auth-modal-recaptcha .g-recaptcha {
-    transform: scale(0.92);
-  }
-
   .mk-auth-modal-card {
     width: min(520px, calc(100vw - 1.2rem));
     padding: 1.4rem;
@@ -2853,6 +2560,11 @@ html {
 
   .mk-auth-modal-body {
     min-height: 320px;
+  }
+
+  .mk-auth-modal-inline-actions {
+    flex-direction: column;
+    align-items: stretch;
   }
 }
 
@@ -2866,11 +2578,6 @@ html {
     animation-duration: 1ms !important;
     animation-iteration-count: 1 !important;
     transition-duration: 1ms !important;
-  }
-
-  .mk-login-modal-overlay,
-  .mk-login-modal-card {
-    animation: none !important;
   }
 
   .mk-auth-modal-card,

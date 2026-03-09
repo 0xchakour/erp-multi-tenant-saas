@@ -13,12 +13,6 @@ export async function createClient(payload) {
   return response.data;
 }
 
-export async function getClientById(clientId) {
-  requireContractEndpoint("clients", "details");
-  const response = await api.get(`/clients/${clientId}`);
-  return response.data?.data ?? response.data;
-}
-
 export async function updateClient(clientId, payload) {
   requireContractEndpoint("clients", "update");
   const response = await api.put(`/clients/${clientId}`, payload);

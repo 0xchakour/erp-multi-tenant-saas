@@ -7,20 +7,6 @@ export async function getBillingStatus() {
   return response.data?.data ?? response.data;
 }
 
-export async function listBillingPlans() {
-  requireContractEndpoint("billing", "plans");
-  const response = await api.get("/billing/plans");
-  return response.data?.data ?? response.data ?? [];
-}
-
-export async function listBillingEvents(limit = 25) {
-  requireContractEndpoint("billing", "events");
-  const response = await api.get("/billing/events", {
-    params: { limit },
-  });
-  return response.data?.data ?? response.data ?? [];
-}
-
 export async function createBillingCheckoutSession(payload) {
   requireContractEndpoint("billing", "checkoutSession");
   const response = await api.post("/billing/checkout-session", payload);
